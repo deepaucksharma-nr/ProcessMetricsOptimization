@@ -28,7 +28,7 @@ func newProcessor(config *Config, logger *zap.Logger, mexp consumer.Metrics, set
 	// Create a metric for counting mutations
 	meter := settings.MeterProvider.Meter("helloworld")
 	mutationsCounter, err := meter.Int64Counter(
-		"nrdot_helloworld_mutations_total",
+		"otelcol_otelcol_helloworld_mutations_total",
 		metric.WithDescription("Total number of metrics modified by the hello world processor"),
 	)
 	if err != nil {
@@ -64,8 +64,8 @@ func (p *helloWorldProcessor) ConsumeMetrics(ctx context.Context, md pmetric.Met
 	metricCount := p.processMetrics(ctx, md)
 
 	// Record the observation and the number of processed items
-	p.obsrecv.EndMetricsOp(ctx, p.config.ProcessorType(), metricCount, nil)
-	
+	p.obsrecv.EndMetricsOp(ctx, metricCount, 0, nil)
+
 	// Increment our custom mutation counter metric
 	p.mutationsCounter.Add(ctx, int64(metricCount))
 
@@ -80,20 +80,20 @@ func (p *helloWorldProcessor) processMetrics(ctx context.Context, md pmetric.Met
 	// Iterate through the resource metrics
 	for i := 0; i < md.ResourceMetrics().Len(); i++ {
 		rm := md.ResourceMetrics().At(i)
-		
+
 		// Add attributes to the resource level if configured
 		if p.config.AddToResource {
 			addHelloAttribute(rm.Resource().Attributes())
 		}
-		
-		// Iterate through the scope metrics  
+
+		// Iterate through the scope metrics
 		for j := 0; j < rm.ScopeMetrics().Len(); j++ {
 			sm := rm.ScopeMetrics().At(j)
-			
+
 			// Iterate through each metric
 			for k := 0; k < sm.Metrics().Len(); k++ {
 				metric := sm.Metrics().At(k)
-				
+
 				// Process the datapoints based on metric type
 				switch metric.Type() {
 				case pmetric.MetricTypeGauge:
@@ -130,11 +130,11 @@ func (p *helloWorldProcessor) processMetrics(ctx context.Context, md pmetric.Met
 			}
 		}
 	}
-	
-	p.logger.Debug("Hello World processor modified metrics", 
+
+	p.logger.Debug("Hello World processor modified metrics",
 		zap.Int("count", metricCount),
 		zap.String("message", p.config.Message))
-	
+
 	return metricCount
 }
 

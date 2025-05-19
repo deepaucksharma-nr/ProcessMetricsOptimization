@@ -38,6 +38,21 @@ Every processor consists of these key files:
 | `processor_test.go` | Unit tests |
 | `README.md` | Documentation for the processor |
 
+## Aligning with OpenTelemetry
+
+NRDOT processors follow the standard [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/) design. Each processor implements the `component.Processor` interface and is created through a factory. The factory parses configuration into a `Config` struct and exposes `CreateMetricsProcessor` (and/or `CreateLogsProcessor`) for the collector to call.
+
+Typical lifecycle:
+
+1. **Factory creates the processor** – configuration is validated and an instance is returned.
+2. **Start** – the processor allocates resources when the collector pipeline starts.
+3. **Consume** – metrics or logs are processed for each call.
+4. **Shutdown** – resources are released on collector shutdown.
+
+For complex matching or transformation logic you can use the [OpenTelemetry Transformation Language (OTTL)](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/pkg/ottl). OTTL expressions allow attribute-based filters or modifications without additional code.
+
+See the upstream [Collector documentation](https://opentelemetry.io/docs/collector/components/#processors) for further reference.
+
 ## Self-Observability Implementation
 
 ### Standard Metrics with obsreport
@@ -50,10 +65,10 @@ if err != nil {
 }
 
 // Start metrics observation
-ctx, numPoints := p.obsrecv.StartMetricsOp(ctx)
+ctx = p.obsrecv.StartMetricsOp(ctx)
 
 // End metrics observation
-p.obsrecv.EndMetricsOp(ctx, p.config.ProcessorType(), metricCount, nil)
+p.obsrecv.EndMetricsOp(ctx, metricCount, 0, nil)
 ```
 
 ### Custom Processor KPIs
@@ -62,7 +77,7 @@ p.obsrecv.EndMetricsOp(ctx, p.config.ProcessorType(), metricCount, nil)
 // Create a metric in the constructor
 meter := settings.MeterProvider.Meter("helloworld")
 mutationsCounter, err := meter.Int64Counter(
-    "nrdot_helloworld_mutations_total",
+    "otelcol_otelcol_helloworld_mutations_total",
     metric.WithDescription("Total number of metrics modified"),
 )
 
@@ -117,3 +132,32 @@ See [docs/COMPLETING_PHASE_5.md](COMPLETING_PHASE_5.md) for additional integrati
 - [ ] Passes linting and static analysis
 - [ ] Works with the Docker Compose setup
 - [ ] Adds dashboard panels for processor metrics
+
+## Aligning with OpenTelemetry
+
+Custom processors follow the standard `component.Processor` lifecycle defined by
+the OpenTelemetry Collector. A processor is created by a factory, started by the
+collector, receives telemetry via its `Consume` method, and is finally shut down
+when the collector stops.
+
+### Lifecycle and Factory Pattern
+
+1. **Factory** – Each processor exposes a `NewFactory` function that returns a
+   `processor.Factory`. The factory provides `createDefaultConfig` and a
+   `create*Processor` function used by the collector to instantiate the
+   component.
+2. **Start/Shutdown** – Implement the `Start` and `Shutdown` methods from
+   `component.Component` to allocate resources and clean them up.
+3. **Consume** – Implement `ConsumeMetrics`, `ConsumeTraces`, or `ConsumeLogs`
+   depending on the processor type. Use `Capabilities()` to declare whether the
+   processor mutates data.
+
+### Attribute Matching with OTTL
+
+The **OpenTelemetry Transformation Language (OTTL)** provides a flexible way to
+express attribute-based matching or transformations without hard‑coding logic in
+Go. Processors can leverage OTTL statements to match on attributes or modify
+telemetry in a declarative fashion.
+
+For more details on the processor lifecycle and OTTL syntax, see the
+[upstream OpenTelemetry documentation](https://github.com/open-telemetry/opentelemetry-collector/blob/main/processor/README.md).
