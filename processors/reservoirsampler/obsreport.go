@@ -10,12 +10,12 @@ import (
 const processorName = "reservoirsampler"
 
 type reservoirSamplerObsreport struct {
-	settings                     component.TelemetrySettings
-	processedPoints             metric.Int64Counter
-	droppedPoints               metric.Int64Counter
-	reservoirFillRatio          metric.Float64Observable
-	selectedIdentitiesCount     metric.Int64Observable
-	eligibleIdentitiesSeenTotal metric.Int64Counter
+	settings                      component.TelemetrySettings
+	processedPoints               metric.Int64Counter
+	droppedPoints                 metric.Int64Counter
+	reservoirFillRatio            metric.Float64Observable
+	selectedIdentitiesCount       metric.Int64Observable
+	eligibleIdentitiesSeenTotal   metric.Int64Counter
 	newIdentitiesAddedToReservoir metric.Int64Counter
 }
 
@@ -82,12 +82,12 @@ func newReservoirSamplerObsreport(settings component.TelemetrySettings) (*reserv
 	}
 
 	return &reservoirSamplerObsreport{
-		settings:                     settings,
-		processedPoints:              processedPoints,
-		droppedPoints:                droppedPoints,
-		reservoirFillRatio:           reservoirFillRatio,
-		selectedIdentitiesCount:      selectedIdentitiesCount,
-		eligibleIdentitiesSeenTotal:  eligibleIdentitiesSeenTotal,
+		settings:                      settings,
+		processedPoints:               processedPoints,
+		droppedPoints:                 droppedPoints,
+		reservoirFillRatio:            reservoirFillRatio,
+		selectedIdentitiesCount:       selectedIdentitiesCount,
+		eligibleIdentitiesSeenTotal:   eligibleIdentitiesSeenTotal,
 		newIdentitiesAddedToReservoir: newIdentitiesAddedToReservoir,
 	}, nil
 }
@@ -99,7 +99,7 @@ func (o *reservoirSamplerObsreport) StartMetricsOp(ctx context.Context) context.
 }
 
 // EndMetricsOp ends the metrics operation and records the number of processed metrics
-func (o *reservoirSamplerObsreport) EndMetricsOp(ctx context.Context, numProcessedPoints int, numDroppedPoints int, err error) {
+func (o *reservoirSamplerObsreport) EndMetricsOp(ctx context.Context, _ string, numProcessedPoints int, numDroppedPoints int, err error) {
 	// Record the number of processed points
 	if o.processedPoints != nil {
 		o.processedPoints.Add(ctx, int64(numProcessedPoints))

@@ -94,7 +94,7 @@ This script will:
 6. Calculate the cardinality reduction percentage (aiming for ≥90%)
 7. Verify that critical processes are preserved
 
-After the test completes successfully, you can explore the results in Grafana, Prometheus, and the mock OTLP sink logs. 
+After the test completes successfully, you can explore the results in Grafana, Prometheus, and the mock OTLP sink logs.
 
 ### Customizing the Pipeline
 
@@ -144,9 +144,8 @@ Functionality: The helloworld processor adds a hello.processor attribute (with a
 Key Self-Metrics (visible in Prometheus/Grafana via the local dev stack):
 | Metric Name | Type | Description |
 |-------------|------|-------------|
-| otelcol_processor_helloworld_processed_metric_points | Counter | Standard obsreport: Count of metric points processed. |
+| otelcol_otelcol_processor_helloworld_processed_metric_points | Counter | Standard obsreport: Count of metric points processed. |
 | otelcol_otelcol_helloworld_mutations_total | Counter | Custom metric: Total number of metric points modified. |
-| otelcol_processor_helloworld_latency_bucket | Histogram | Standard obsreport: Latency of processing. |
 
 ## "PriorityTagger" Processor (Phase 1 Deliverable)
 
@@ -191,7 +190,7 @@ processors:
 Key Self-Metrics:
 | Metric Name | Type | Description |
 |-------------|------|-------------|
-| otelcol_processor_prioritytagger_processed_metric_points | Counter | Standard obsreport: Count of metric points processed. |
+| otelcol_otelcol_processor_prioritytagger_processed_metric_points | Counter | Standard obsreport: Count of metric points processed. |
 | otelcol_processor_dropped_metric_points | Counter | Standard obsreport: Count of metric points dropped due to errors. |
 | otelcol_otelcol_prioritytagger_critical_processes_tagged_total | Counter | Custom: Count of processes tagged as critical. |
 
@@ -228,10 +227,10 @@ processors:
     hysteresis_duration: "30s"
     min_k_value: 5
     max_k_value: 50
-    
+
     # Fixed K (not used when Dynamic K is enabled)
     # k_value: 10
-    
+
     # The metric used to rank processes
     key_metric_name: "process.cpu.utilization"
     # Optional: Secondary metric for tie-breaking
@@ -244,7 +243,7 @@ processors:
 Key Self-Metrics:
 | Metric Name | Type | Description |
 |-------------|------|-------------|
-| otelcol_processor_adaptivetopk_processed_metric_points | Counter | Count of metric points processed. |
+| otelcol_otelcol_processor_adaptivetopk_processed_metric_points | Counter | Count of metric points processed. |
 | otelcol_processor_adaptivetopk_dropped_metric_points | Counter | Count of metric points dropped. |
 | otelcol_otelcol_adaptivetopk_topk_processes_selected_total | Counter | Number of non-critical processes selected for Top K. |
 | otelcol_otelcol_adaptivetopk_current_k_value | Gauge | Current K value when using dynamic K. |
@@ -289,7 +288,7 @@ processors:
 Key Self-Metrics:
 | Metric Name | Type | Description |
 |-------------|------|-------------|
-| otelcol_processor_othersrollup_processed_metric_points | Counter | Count of metric points processed. |
+| otelcol_otelcol_processor_othersrollup_processed_metric_points | Counter | Count of metric points processed. |
 | otelcol_processor_othersrollup_dropped_metric_points | Counter | Count of original points dropped after rollup. |
 | otelcol_otelcol_othersrollup_aggregated_series_count_total | Counter | Number of new "_other_" series generated. |
 | otelcol_otelcol_othersrollup_input_series_rolled_up_total | Counter | Count of input series aggregated into "_other_". |
@@ -334,7 +333,7 @@ processors:
 Key Self-Metrics:
 | Metric Name | Type | Description |
 |-------------|------|-------------|
-| otelcol_processor_reservoirsampler_processed_metric_points | Counter | Count of metric points processed. |
+| otelcol_otelcol_processor_reservoirsampler_processed_metric_points | Counter | Count of metric points processed. |
 | otelcol_processor_reservoirsampler_dropped_metric_points | Counter | Count of points dropped (eligible but not sampled). |
 | otelcol_otelcol_reservoirsampler_reservoir_fill_ratio | Gauge | Current fill ratio of the reservoir (0.0 to 1.0). |
 | otelcol_otelcol_reservoirsampler_selected_identities_count | Gauge | Current count of unique identities in the reservoir. |
